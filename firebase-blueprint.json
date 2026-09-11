@@ -1,0 +1,119 @@
+{
+  "entities": {
+    "UserProfileData": {
+      "title": "UserProfileData",
+      "description": "Schema for registered students and administrators",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 128 },
+        "displayName": { "type": "string", "maxLength": 100 },
+        "role": { "type": "string", "enum": ["ADMIN", "PREMIUM_USER", "VERIFIED_USER", "UNVERIFIED_USER", "GUEST"] },
+        "status": { "type": "string", "enum": ["ACTIVE", "PENDING_APPROVAL", "SUSPENDED", "REJECTED"] },
+        "emailVerified": { "type": "boolean" },
+        "verifiedAt": { "type": "string" },
+        "subscriptionTier": { "type": "string", "enum": ["FREE", "PLUS", "PRO", "ENTERPRISE"] },
+        "permissionProfileId": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string" },
+        "lastLoginAt": { "type": "string" },
+        "college": { "type": "string", "maxLength": 100 },
+        "majorId": { "type": "string", "maxLength": 50 },
+        "level": { "type": "number" },
+        "semester": { "type": "number" },
+        "points": { "type": "number" },
+        "streak": { "type": "number" },
+        "rank": { "type": "string", "maxLength": 50 },
+        "storageUsedBytes": { "type": "number" },
+        "customOverrides": { "type": "object" }
+      },
+      "required": ["uid", "email", "role", "status"]
+    },
+    "StudentLearningDNA": {
+      "title": "StudentLearningDNA",
+      "description": "Digital footprint and learning metrics for individual student",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "overallScore": { "type": "number" },
+        "strengths": { "type": "array" },
+        "weaknesses": { "type": "array" },
+        "recurringMistakes": { "type": "array" },
+        "subjectPerformance": { "type": "object" },
+        "learningPatterns": { "type": "object" },
+        "milestones": { "type": "array" },
+        "lastUpdated": { "type": "string" }
+      },
+      "required": ["userId", "overallScore", "lastUpdated"]
+    },
+    "FileMetadata": {
+      "title": "FileMetadata",
+      "description": "Metadata for files stored in Cloud Storage",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "fileName": { "type": "string", "maxLength": 255 },
+        "fileSize": { "type": "number" },
+        "mimeType": { "type": "string", "maxLength": 100 },
+        "storageUrl": { "type": "string", "maxLength": 1000 },
+        "storagePath": { "type": "string", "maxLength": 500 },
+        "category": { "type": "string", "enum": ["LECTURE_RECORDING", "SUMMARY_DOCUMENT", "HOMEWORK", "TRANSCRIPT", "OTHER"] },
+        "associatedCourseId": { "type": "string", "maxLength": 100 },
+        "uploadedAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "fileName", "fileSize", "storagePath"]
+    },
+    "AuditLogEntry": {
+      "title": "AuditLogEntry",
+      "description": "Immutable security and administrative audit event",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "timestamp": { "type": "string" },
+        "actorId": { "type": "string", "maxLength": 128 },
+        "actorEmail": { "type": "string", "maxLength": 128 },
+        "actorName": { "type": "string", "maxLength": 100 },
+        "action": { "type": "string", "maxLength": 100 },
+        "category": { "type": "string", "enum": ["AUTH", "PERMISSION", "USER_MANAGEMENT", "STORAGE", "SYSTEM", "ACADEMIC"] },
+        "targetId": { "type": "string", "maxLength": 128 },
+        "targetName": { "type": "string", "maxLength": 100 },
+        "details": { "type": "string", "maxLength": 1000 },
+        "result": { "type": "string", "enum": ["SUCCESS", "FAILED", "BLOCKED"] }
+      },
+      "required": ["id", "timestamp", "actorId", "action", "category", "result"]
+    },
+    "SystemConfig": {
+      "title": "SystemConfig",
+      "description": "Central system configuration, security rules, and permission profiles",
+      "type": "object",
+      "properties": {
+        "auth": { "type": "object" },
+        "storage": { "type": "object" },
+        "security": { "type": "object" },
+        "ai": { "type": "object" }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfileData" },
+      "description": "User profile collection"
+    },
+    "/learningDNA/{userId}": {
+      "schema": { "$ref": "#/entities/StudentLearningDNA" },
+      "description": "Learning DNA per student"
+    },
+    "/file_metadata/{fileId}": {
+      "schema": { "$ref": "#/entities/FileMetadata" },
+      "description": "File metadata collection"
+    },
+    "/audit_logs/{logId}": {
+      "schema": { "$ref": "#/entities/AuditLogEntry" },
+      "description": "System audit logs"
+    },
+    "/system_config/{configDoc}": {
+      "schema": { "$ref": "#/entities/SystemConfig" },
+      "description": "System configuration documents"
+    }
+  }
+}

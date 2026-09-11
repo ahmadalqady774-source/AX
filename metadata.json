@@ -1,0 +1,8 @@
+{
+  "name": "Remix حساب ٧٧٤ gpt ١ : ٢ المرشد الجامعي لجامعة تعز ",
+  "description": "منصة تعليمية متكاملة مدعومة بالذكاء الاصطناعي لمساعدة الطلاب في ترتيب للمذاكرة الأكاديمية وتحقيق النجاح.والامتياز",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

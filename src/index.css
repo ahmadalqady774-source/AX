@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Alexandria", ui-sans-serif, system-ui, sans-serif;
+  --color-primary: var(--primary-color, #059669);
+  --color-secondary: var(--secondary-color, #0284c7);
+  --color-accent: #f59e0b;
+}
+
+:root {
+  font-family: var(--font-sans);
+  --primary-color: #059669; /* Default Emerald */
+  --secondary-color: #0284c7;
+}
+
+/* Theme Classes */
+.theme-indigo { --primary-color: #4f46e5; --secondary-color: #6366f1; }
+.theme-emerald { --primary-color: #059669; --secondary-color: #10b981; }
+.theme-rose { --primary-color: #e11d48; --secondary-color: #f43f5e; }
+.theme-amber { --primary-color: #d97706; --secondary-color: #f59e0b; }
+.theme-midnight { --primary-color: #0f172a; --secondary-color: #1e293b; }
+
+body {
+  direction: rtl;
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+

@@ -1,0 +1,94 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Helper Functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isSystemAdmin() {
+      return isSignedIn() && request.auth.token.email == 'ahmadalqady774@gmail.com';
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        isSystemAdmin() ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN')
+      );
+    }
+
+    // Users Collection: User directory and profile management with full admin control
+    match /users/{userId} {
+      allow read: if true;
+      
+      // Allow user creation upon registration (self-service) or by administrators
+      allow create: if isSignedIn() && (
+        isOwner(userId) || isSystemAdmin() || isAdmin()
+      );
+      
+      // Allow profile updates by owner or administrative role/override updates by admins
+      allow update: if isSignedIn() && (
+        isAdmin() || isSystemAdmin() || isOwner(userId)
+      );
+      
+      allow delete: if isAdmin() || isSystemAdmin();
+    }
+
+    // Student Learning DNA: Strictly private to the student and system/admin
+    match /learningDNA/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create, update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // File Metadata: Strict ownership enforcement
+    match /file_metadata/{fileId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // Central System Settings (Read by all authenticated, Write strictly by Admin)
+    match /system_config/{configDoc} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Audit Logs: Immutable log creation by authenticated actor, Read strictly by Admin, No updates permitted
+    match /audit_logs/{logId} {
+      allow create: if isSignedIn() && request.resource.data.actorId == request.auth.uid;
+      allow read: if isAdmin();
+      allow update: if false; // Immutable audit trail
+      allow delete: if isAdmin();
+    }
+
+    // University public data: Courses, Schedules, Doctors
+    match /courses/{courseId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /schedules/{scheduleId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /doctors/{doctorId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Community & Forum
+    match /community_posts/{postId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && (resource.data.authorId == request.auth.uid || isAdmin());
+    }
+  }
+}
